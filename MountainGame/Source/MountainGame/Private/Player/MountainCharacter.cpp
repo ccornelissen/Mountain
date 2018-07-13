@@ -2,6 +2,7 @@
 
 #include "MountainCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -9,6 +10,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "PaperFlipbookComponent.h"
 #include "PaperFlipbook.h"
+#include "LightningBall.h"
+#include "MountainPlayerController.h"
 
 
 // Sets default values
@@ -72,21 +75,64 @@ void AMountainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	// handle touch devices
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &AMountainCharacter::TouchStarted);
+	PlayerInputComponent->BindTouch(IE_Repeat, this, &AMountainCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &AMountainCharacter::TouchStopped);
+
+}
+
+void AMountainCharacter::PlayerCharged()
+{
+	bCharging = false;
 }
 
 void AMountainCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-	Attack();
+	UE_LOG(LogTemp, Warning, TEXT("Player Touched"));
+
+	AMountainPlayerController* MyController = Cast<AMountainPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	if (MyController)
+	{
+		SpawnLocation = MyController->GetFingerHitLocation(FingerIndex);
+	}
 }
 
 void AMountainCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Player Released"));
+	if (bCharging == false)
+	{
+		Attack(SpawnLocation);
+	}
 }
 
-void AMountainCharacter::Attack()
+void AMountainCharacter::Attack(FVector SpawnLocation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Player Touching"));
+	if (LightningBall)
+	{
+		ALightningBall* CurProjectile = GetWorld()->SpawnActor<ALightningBall>(LightningBall, SpawnLocation, SpawnRotation);
+
+		CurProjectile->SetDamage(MyStats.fDamage);
+
+		CurProjectile->SetLifeSpan(MyStats.fBallLifeSpan);
+
+		GetWorld()->GetTimerManager().SetTimer(ChargeHandle, this, &AMountainCharacter::PlayerCharged, MyStats.fPlayerChargeTime, false);
+
+		bCharging = true;
+	}
+}
+
+void AMountainCharacter::Damaged(float InDamage)
+{
+	MyStats.fPlayerHealth = MyStats.fPlayerHealth - InDamage;
+
+	if (MyStats.fPlayerHealth <= 0)
+	{
+		GameOver();
+	}
+}
+
+void AMountainCharacter::GameOver()
+{
+	//Bring up game over screen and play ad if applicable
 }
 
