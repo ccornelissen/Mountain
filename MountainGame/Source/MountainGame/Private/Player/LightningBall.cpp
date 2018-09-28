@@ -41,6 +41,8 @@ void ALightningBall::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor
 	if (Enemy)
 	{
 		Enemy->Damaged(MyStats.fDamage);
+
+		UE_LOG(LogTemp, Warning, TEXT("Damaging Enemy!"))
 	}
 }
 

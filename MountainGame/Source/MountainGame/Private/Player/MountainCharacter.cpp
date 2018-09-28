@@ -93,7 +93,8 @@ void AMountainCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Loc
 
 	if (MyController)
 	{
-		SpawnLocation = MyController->GetFingerHitLocation(FingerIndex);
+		FVector FingerLocation = MyController->GetFingerHitLocation(FingerIndex);
+		SpawnLocation = FVector(FingerLocation.X, FingerLocation.Y, 0);
 	}
 }
 

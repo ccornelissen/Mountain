@@ -47,6 +47,7 @@ void AEnemyBase::Damaged(float InDamage)
 void AEnemyBase::Death()
 {
 	UE_LOG(LogTemp, Warning, TEXT("I Died :( "));
+	Destroy();
 }
 
 void AEnemyBase::OnOverlapBegin(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)

@@ -12,7 +12,9 @@ struct FLightningVariables
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
 	float fLifeSpan = 1.5f;
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
 	float fDamage = 100.0f;
 };
 
@@ -39,6 +41,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
 	FLightningVariables MyStats;
 
 	UPaperFlipbookComponent* BookComponent;
